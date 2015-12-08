@@ -26,7 +26,7 @@
       </ul>
 
       <ul class="nav navbar-nav navbar-right">
-      	<li><a href="/">Пользователь</a></li>
+      	<li><a href=""> <%= session 'email' %></a></li>
         <li><a href="#">Выход</a></li>
 
       <form class="navbar-form navbar-right" role="form" method="GET" action="/users">

@@ -15,7 +15,6 @@
   	</div>
 </div>
 
-
 <nav class="navbar navbar-default">
   <div class="container-fluid">
 
@@ -23,11 +22,10 @@
       <ul class="nav navbar-nav">
       	<li><a href="/users/add">Добавить пользователя</a></li>
         <li><a href="/users">Показать всю таблицу</a></li>
-        
       </ul>
 
       <ul class="nav navbar-nav navbar-right">
-      	<li><a href=""></a></li>
+      	<li><a href=""> <%= session 'email' %></a></li>
         <li><a href="/logout">Выход</a></li>
 
       <form class="navbar-form navbar-right" role="form" method="GET" action="/users">

@@ -1,7 +1,7 @@
 package TestApp;
 use Mojo::Base 'Mojolicious';
-use Mojo::Transaction::WebSocket;
 
+		use Data::Dumper;
 use DBI;
 sub startup {
   my $self = shift;
@@ -13,20 +13,6 @@ sub startup {
   my $password = "";
   my $dbh = DBI->connect("DBI:mysql:$database", $login, $password);
 
-
-
-my $ws = Mojo::Transaction::WebSocket->new;
-$ws->send('Hello World!');
-$ws->on(message => sub {
-  my ($ws, $msg) = @_;
-  say "Message: $msg";
-});
-$ws->on(finish => sub {
-  my ($ws, $code, $reason) = @_;
-  say "WebSocket closed with status $code.";
-});
-
-  #$self->plugin('TestApp::Helpers');
   $self->helper(dbcon => sub {
   	return $dbh;
   	});
@@ -36,8 +22,7 @@ $ws->on(finish => sub {
 
   my $auth = $r->under('/' => sub{
   		my $c = shift;
-  		#$c->render(text => 'Authorisation form');
-
+  		print Dumper($c->session);
   		return 1;
 
   		$c->render(template => 'example/loginform');
@@ -47,6 +32,7 @@ $ws->on(finish => sub {
 
   $r->get('/login')->to('contr#login');
   $r->post('/login')->to('contr#authorisation');
+  $r->get('/api/users')->to('contr#api');
   $auth->get('/users')->to(controller => 'contr', action =>'getUsers');
   $auth->get('/users/add')->to(controller => 'contr', action =>'addUser');
   $auth->post('users/add')->to(controller => 'contr', action =>'addUserPost');

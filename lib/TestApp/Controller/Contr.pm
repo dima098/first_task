@@ -3,6 +3,9 @@ use Mojo::Base 'Mojolicious::Controller';
 use DBI;
 use Digest::MD5 qw(md5);
 use Mojolicious::Sessions;
+use Mojo::Upload;
+use Data::Dumper;
+
 
 	sub login {
 		my $c = shift;
@@ -12,6 +15,7 @@ use Mojolicious::Sessions;
 	sub logout {
 		my $c = shift;
 		#clean session
+		$c->session->{email} = '';
 		$c->redirect_to('/login');
 	};
 
@@ -25,12 +29,14 @@ use Mojolicious::Sessions;
  		my $query = $dbh->prepare('SELECT * FROM users WHERE email=\''.$email.'\' and pass=\''.$password.'\'');
  		$query->execute();
 
- 		$c->stash(currentUser => $email);
-
+ 		$c->session->{email} = $email;
+ 		$c->session(expiration => 604800);
+		
  		if ($query->rows > 0)
  		{
 
- 			$c->redirect_to('/users', email => $email);
+ 			$c->redirect_to('/users');
+
  			#запись сессии
  		}
  		else
@@ -44,9 +50,15 @@ use Mojolicious::Sessions;
 		my $c = shift;
 
 
+#print Dumper($c->stash);
  		my $dbh = $c->dbcon;
  		my $param = $c->param('sparam');
  		my $query;
+ 		my $email = $c->stash('email');
+
+
+
+
  		if ($param ne '')
  		{
 			$query = $dbh->prepare('SELECT * FROM users WHERE name like \'%'.$param.'%\' or email like \'%'.$param.'%\'');
@@ -55,10 +67,12 @@ use Mojolicious::Sessions;
 		{
 			$query = $dbh->prepare('SELECT * FROM users');
 		}
+
+
 		
 		$query->execute();
 
-		$c->render(template => 'example/table', message => $query);
+		$c->render(template => 'example/table', message => $query, email => $email);
 
 	};
 
@@ -96,6 +110,8 @@ use Mojolicious::Sessions;
 			my $dbh = $c->dbcon;
 			my $query = $dbh->prepare('INSERT INTO users (name, pass, email, money) VALUES(?,?,?,?)');
 			$query->execute($name, $password, $email, $money);
+    
+
 			$c->flash(messageFlash => 'User has added');
 
 			$c->redirect_to('/users'); 
