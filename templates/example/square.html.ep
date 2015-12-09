@@ -7,7 +7,7 @@
     <body>
 
 
-    <div id="idd" style="width:500px;height:500px;color:#3366CC;"></div>
+    <div id="idd" style="width:500px;height:500px;background-color:#3366CC;"></div>
             <script>
       var ws = new WebSocket('<%= url_for('changecolor')->to_abs %>');
 
@@ -16,8 +16,22 @@
 
       ws.onmessage = function (event) {
         //document.body.innerHTML += JSON.parse(event.data).msg;
-        document.getElementById("idd").style.color="red";
+        document.getElementById("idd").style.backgroundColor=getRandomColor();
       };
+
+      function getRandomColor ()
+      {
+        var letters = "1234567890ABCDEF";
+        var color = "#";
+        
+
+        for (var i = 0; i < 6; i++)
+        {
+          color += letters.charAt(Math.floor((Math.random() * 16)));
+        }
+
+        return color;
+      }
 
 
     </script>
