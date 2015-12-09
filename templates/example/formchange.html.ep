@@ -42,7 +42,6 @@
   </div>
 </nav>
 
-
 <form role="form" action= <%= '/users/'.stash('id').'/change' %> method="POST">
 	 <div class="form-group">
 		  <label for="name">Имя</label>

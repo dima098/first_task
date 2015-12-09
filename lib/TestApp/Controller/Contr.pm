@@ -7,6 +7,10 @@ use Mojo::Upload;
 use Data::Dumper;
 
 
+	sub api {
+		
+	};
+
 	sub login {
 		my $c = shift;
 		$c->render(template => 'example/loginform');
@@ -142,7 +146,7 @@ use Data::Dumper;
 			$money = $arr[2];
 		}
 
-		$c->render(template => 'example/formchange', name => $name, email => $email, money => $money, id => $id);
+		$c->render(template => 'example/form', name => $name, email => $email, money => $money, id => $id);
 	};
 
 	sub changeUserPost {
@@ -164,7 +168,7 @@ use Data::Dumper;
 			if (!wontChange($password, $passwordRepeat))
 			{
 				print 'UPDATE users SET name=?, password=?, email=?, money=? WHERE id=?';
-				my $query = $dbh->prepare('UPDATE users SET name=?, password=?, email=?, money=? WHERE id=?');
+				my $query = $dbh->prepare('UPDATE users SET name=?, pass=?, email=?, money=? WHERE id=?');
 				$query->execute($name, $password, $email, $money, $c->stash('id'));
 			}
 			else
@@ -176,7 +180,7 @@ use Data::Dumper;
 			$c->redirect_to('/users'); 
 		}
 
-		$c->render(template => 'example/formchange', passwordError => $arrErrors->[0], emailError => $arrErrors->[1], moneyError => $arrErrors->[2]);
+		$c->render(template => 'example/form', passwordError => $arrErrors->[0], emailError => $arrErrors->[1], moneyError => $arrErrors->[2]);
 	};
 
 

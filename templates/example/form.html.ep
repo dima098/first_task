@@ -43,7 +43,13 @@
   </div>
 </nav>
 
+<% use Data::Dumper;   print Dumper(stash); %>
+
+<% if (stash('action') eq 'addUser' || stash('action') eq 'addUserPost') { %>
 <form role="form" action="/users/add" method="POST">
+<% } elsif (stash('action') eq 'changeUser' || stash('action') eq 'changeUserPost') {%>
+<form role="form" action= <%= '/users/'.stash('id').'/change' %> method="POST">
+ <% } %>
 	 <div class="form-group">
 		  <label for="name">Имя</label>
 		  %= input_tag 'name', type => 'text', class => 'form-control', id => 'name', placeholder => 'Введите имя', value => stash('name')
@@ -92,7 +98,6 @@
 
  	 <div class="form-group">
 	 	
-	 <div class="form-group">
 
 	 <p>
 		Выберите фото:

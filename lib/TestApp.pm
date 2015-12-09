@@ -22,7 +22,7 @@ sub startup {
 
   my $auth = $r->under('/' => sub{
   		my $c = shift;
-  		print Dumper($c->session);
+
   		return 1;
 
   		$c->render(template => 'example/loginform');
