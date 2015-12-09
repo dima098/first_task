@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Echo</title>
+    <script>
+
+
+      function onChangeColor() 
+      {
+              var ws = new WebSocket('<%= url_for('changecolor')->to_abs %>');
+              ws.onopen = function (event) {
+        ws.send(JSON.stringify({msg: 'I ♥ Mojolicious!'}));
+          };
+
+      }
+      
+    </script>
+  </head>
+  <body>
+    <input type = "button" value="Изменить цвет" onclick="onChangeColor()">
+  </body>
+</html>

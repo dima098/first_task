@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Echo</title>
+
+  </head>
+    <body>
+
+
+    <div id="idd" style="width:500px;height:500px;color:#3366CC;"></div>
+            <script>
+      var ws = new WebSocket('<%= url_for('changecolor')->to_abs %>');
+
+      ws.onopen = function (event) {
+      };
+
+      ws.onmessage = function (event) {
+        //document.body.innerHTML += JSON.parse(event.data).msg;
+        document.getElementById("idd").style.color="red";
+      };
+
+
+    </script>
+
+  </body>
+</html>

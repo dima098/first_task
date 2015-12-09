@@ -8,7 +8,39 @@ use Data::Dumper;
 
 
 	sub api {
+		my $c = shift;
+		my $param = $c->param('sparam');
+		my $dbh = $c->dbcon;
+		my $query;
+		my $arrJson = [];
+
+		if ($param ne '')
+ 		{
+			$query = $dbh->prepare('SELECT * FROM users WHERE name like \'%'.$param.'%\' or email like \'%'.$param.'%\'');
+		}
+		else
+		{
+			$query = $dbh->prepare('SELECT * FROM users');
+		}
 		
+		$query->execute();
+
+		while (my @arr = $query->fetchrow_array())
+		{
+			push $arrJson, {
+							id => $arr[0],
+			 				name => $arr[1],
+			  				email => $arr[2],
+			   				pass => $arr[3],
+			    			money => $arr[5],
+			     			updated => $arr[6],
+			      			created => $arr[7],
+			 				image => $arr[8]
+			 				};
+		}
+
+		$c->render(json => {status => 'ok', users => $arrJson});
+
 	};
 
 	sub login {
@@ -53,8 +85,6 @@ use Data::Dumper;
 	sub getUsers {
 		my $c = shift;
 
-
-#print Dumper($c->stash);
  		my $dbh = $c->dbcon;
  		my $param = $c->param('sparam');
  		my $query;

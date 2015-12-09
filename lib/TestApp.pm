@@ -1,13 +1,15 @@
 package TestApp;
 use Mojo::Base 'Mojolicious';
 
-		use Data::Dumper;
+use Data::Dumper;
 use DBI;
+
+
+
 sub startup {
   my $self = shift;
 
   $self->plugin('PODRenderer');
-
   my $database = "TESTDB";
   my $login = "root";
   my $password = "";
@@ -40,6 +42,10 @@ sub startup {
   $auth->post('/users/:id/change')->to('contr#changeUserPost');
   $auth->get('/users/:id/remove')->to('contr#removeUser');
   $auth->get('/logout')->to('contr#logout');
+  $r->get('/test')->to('example#test');
+  $r->websocket('/changecolor')->to('example#socket');
+  $r->get('/button')->to('example#buttonColor');
+  $r->get('/square')->to('example#squareColor');
 
 
 
