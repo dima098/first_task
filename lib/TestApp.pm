@@ -26,30 +26,12 @@ sub startup {
 
   my $auth = $r->under('/' => sub{
   		my $c = shift;
+      use Mojo::JSON::Pointer;
+use Data::Dumper;
 
-  		my $email = $c->session('email');
- 		my $password = ($c->session('pass'));
- 		my $query = $dbh->prepare('SELECT * FROM users WHERE email=\''.$email.'\' and pass=\''.$password.'\'');
- 		$query->execute();
-
- 		while (my @arr = $query->fetchrow_array)
- 		{
-	 		$c->stash(id => $arr[0]);
-			$c->stash(name => $arr[1]);
-			$c->stash(email => $arr[2]);
-			$c->stash(pass => $arr[3]);
-			$c->stash(money => $arr[5]);
-			$c->stash(updated => $arr[6]);
-			$c->stash(created => $arr[7]);
-			$c->stash(photo => $arr[8]);
-		}
-
-
-  		return 1 if $query->rows > 0;
-
-  		$c->render(template => 'example/loginform');
-
-  		return undef;
+my $pointer = Mojo::JSON::Pointer->new({foo => [{name => 'd'}, {name => 'f'}] } );
+print Dumper($pointer->get('/foo/0/name'));
+  		$c->logged;
   	});
 
   $r->get('/login')->to('contr#login');
@@ -67,8 +49,6 @@ sub startup {
   $r->get('/button')->to('example#buttonColor');
   $r->get('/square')->to('example#squareColor');
 
-  $r->post('/upload')->to('contr#uploadPost');
-  $r->get('/upload')->to('contr#upload');
 
 
 

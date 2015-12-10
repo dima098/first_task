@@ -44,28 +44,6 @@ use Mojolicious::Validator;
 
 	};
 
-	sub uploadPost {
-		my $c = shift;
-		my $filename = $c->param('image')->filename;
-
-		if (lc $filename =~ /(.png|.jpg)$/)
-		{
-			my $file = $c->req->upload('image');
-        	$file->move_to("public/images/aaa.pl");
-        	$c->redirect_to('/users');
-		}
-		else
-		{
-
-		}
-
-
-
-	};
-	sub upload {
-
-		shift->render(template => 'example/testupload');
-	};
 
 	sub login {
 		my $c = shift;
@@ -181,22 +159,31 @@ use Mojolicious::Validator;
 		
 		if (!$summary)
 		{
+			my $dbh = $c->dbcon;		
+			if ($filename ne '')
+			{
+				my $file = $c->req->upload('image');
+				my $newName = makeUniqueFileName($name, $email, $filename);
+		        $file->move_to("public/images/".$newName);
 
-			my $file = $c->req->upload('image');
-			my $newName = makeUniqueFileName($name, $email, $filename);
-	        $file->move_to("public/images/".$newName);
-
-			my $dbh = $c->dbcon;
-			my $query = $dbh->prepare('INSERT INTO users (name, pass, email, money, photo) VALUES(?,?,?,?,?)');
-			$query->execute($name, $password, $email, $money, "images/".$newName);
+				my $query = $dbh->prepare('INSERT INTO users (name, pass, email, money, photo) VALUES(?,?,?,?,?)');
+				$query->execute($name, $password, $email, $money, "images/".$newName);
+			}
+			else
+			{
+				my $query = $dbh->prepare('INSERT INTO users (name, pass, email, money) VALUES(?,?,?,?)');
+				$query->execute($name, $password, $email, $money);
+			}
 	        	
 			$c->flash(messageFlash => 'User has added');
 
 			$c->redirect_to('/users'); 
+			
 		}
 		else
 		{
 			$c->render(template => 'example/form', 
+				idNew => $c->stash('idNew'),
 				emailNew => $email,
 				emailError => $arrErrors->[1],
 				nameNew => $name, 
@@ -219,6 +206,8 @@ use Mojolicious::Validator;
 		my $query = $dbh->prepare('SELECT name, email, money FROM users WHERE id='.$id);
 		$query->execute();
 
+		print Dumper($c->stash);
+
 		while (my @arr = $query->fetchrow_array)
 		{
 			$name = $arr[0];
@@ -229,17 +218,17 @@ use Mojolicious::Validator;
 		$c->render(template => 'example/form', nameNew => $name, emailNew => $email, moneyNew => $money, idNew => $id);
 	};
 
-	sub changeUserPost {
+	sub changeUserPost { 
 
 		my $c = shift;
-
+		my $id = $c->param('id');
 		my $name = $c->param('name');
 		my $password = $c->param('password');
 		my $passwordRepeat = $c->param('passwordRepeat');
 		my $email = $c->param('email');
 		my $money = $c->param('money');
 		my $filename = $c->param('image')->filename;
-		my $arrErrors = [validatePasswordForChange($password, $passwordRepeat), validateEmailChange($c, $email), validateMoney($money), validateFileChange($filename)];
+		my $arrErrors = [validatePasswordForChange($password, $passwordRepeat), validateEmailChange($c, $email), validateMoney($money), validateFile($filename)];
 		my $summary = $arrErrors->[0] + $arrErrors->[1] + $arrErrors->[2] + $arrErrors->[3];
 		
 		if (!$summary)
@@ -253,29 +242,33 @@ use Mojolicious::Validator;
 	        	$file->move_to("public/images/".$newName);
 
 	        	my $query = $dbh->prepare('UPDATE users SET photo=? WHERE id=?');
-				$query->execute("images/".$newName, $c->stash('idNew'));
+				$query->execute("images/".$newName, $id);
 	    	}
 			
 			if (!wontChange($password, $passwordRepeat))
 			{
 				print 'UPDATE users SET name=?, password=?, email=?, money=? WHERE id=?';
 				my $query = $dbh->prepare('UPDATE users SET name=?, pass=?, email=?, money=? WHERE id=?');
-				$query->execute($name, $password, $email, $money, $c->stash('idNew'));
+				$query->execute($name, $password, $email, $money, $id);
 			}
 			else
 			{
 				my $query = $dbh->prepare('UPDATE users SET name=?, email=?, money=? WHERE id=?');
-				$query->execute($name, $email, $money, $c->stash('idNew'));
+				$query->execute($name, $email, $money, $id);
 			}
 			$c->flash(messageFlash => 'User has changed');
 			$c->redirect_to('/users'); 
 		}
 
-		$c->render(template => 'example/form',
-				   passwordError => $arrErrors->[0],
-				   emailError => $arrErrors->[1], 
-				   moneyError => $arrErrors->[2],
-				   fileError => $arrErrors->[3]);
+			$c->render(template => 'example/form', 
+				emailNew => $email,
+				emailError => $arrErrors->[1],
+				nameNew => $name, 
+				moneyNew => $money,
+				moneyError => $arrErrors->[2],
+				passwordError => $arrErrors->[0],
+				fileError => $arrErrors->[3],
+				idNew => $id); 
 	};
 
 
@@ -348,18 +341,6 @@ use Mojolicious::Validator;
 	};
 
 	sub validateFile {
-		my $filename = shift;
-		if (lc $filename =~ /(.png|.jpg)$/)
-		{
-			return 0;
-		}
-		else
-		{
-			return 1;
-		}
-	};
-
-	sub validateFileChange {
 	my $filename = shift;
 	if (lc $filename =~ /(.png|.jpg)$/ or $filename eq '')
 	{
