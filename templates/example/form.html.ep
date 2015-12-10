@@ -48,11 +48,11 @@
 <% if (stash('action') eq 'addUser' || stash('action') eq 'addUserPost') { %>
 <form role="form" action="/users/add" method="POST" enctype="multipart/form-data">
 <% } elsif (stash('action') eq 'changeUser' || stash('action') eq 'changeUserPost') {%>
-<form role="form" action= <%= '/users/'.stash('id').'/change' %> method="POST" enctype="multipart/form-data">
+<form role="form" action= <%= '/users/'.stash('idNew').'/change' %> method="POST" enctype="multipart/form-data">
  <% } %>
 	 <div class="form-group">
 		  <label for="name">Имя</label>
-		  %= input_tag 'name', type => 'text', class => 'form-control', id => 'name', placeholder => 'Введите имя', value => stash('name')
+		  %= input_tag 'name', type => 'text', class => 'form-control', id => 'name', placeholder => 'Введите имя', value => stash('nameNew')
 		  
 	 </div>
 
@@ -64,7 +64,7 @@
 	 <%}%>
 		  <label class="control-label" for="email">Email</label>
 
-		  %= input_tag 'email', type => 'email', class => 'form-control', id => 'email', placeholder => 'Введите email', value => stash('email')
+		  %= input_tag 'email', type => 'email', class => 'form-control', id => 'email', placeholder => 'Введите email', value => stash('emailNew')
 	 </div>
 
 	 <% if (stash('passwordError')) { %>
@@ -93,7 +93,7 @@
 	 <%}%>
 		  <label class="control-label" for="passrepeat">Количество денег</label>
 
-		  %= input_tag 'money', type => 'number', class => 'form-control', id => 'money', placeholder => 'Количество денег', value => stash('money')
+		  %= input_tag 'money', type => 'number', class => 'form-control', id => 'money', placeholder => 'Количество денег', value => stash('moneyNew')
 	 </div>
 
  	 <% if (stash('fileError')) { %>

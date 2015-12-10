@@ -9,11 +9,26 @@
     <body>
  			
 <form role="form" action="/login" method="POST">
-  <div class="form-group">
+  <% if (stash('loginError')) { %>
+
+   <div class="form-group has-error">
+   <% } else { %>
+   <div class="form-group">
+   <%}%>
+
     <label for="inputEmail">Email</label>
     <input type="email" class="form-control" id="inputEmail" placeholder="Email" name="email">
   </div>
-  <div class="form-group">
+
+
+   <% if (stash('loginError')) { %>
+
+   <div class="form-group has-error">
+   <% } else { %>
+   <div class="form-group">
+   <%}%>
+
+
     <label for="inputPassword">Пароль</label>
     <input type="password" class="form-control" id="inputPassword" placeholder="Пароль" name="password">
   </div>

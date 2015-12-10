@@ -1,4 +1,4 @@
-package Mojolicious::Plugin::Helpers;
+package Helpers;
 use Mojo::Base 'Mojolicious::Plugin';
 
 sub register {

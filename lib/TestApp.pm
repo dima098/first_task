@@ -10,6 +10,7 @@ sub startup {
   my $self = shift;
 
   $self->plugin('PODRenderer');
+  $self->plugin('Helpers');
   my $database = "TESTDB";
   my $login = "root";
   my $password = "";
@@ -19,13 +20,32 @@ sub startup {
   	return $dbh;
   	});
 
+
   my $r = $self->routes;
 
 
   my $auth = $r->under('/' => sub{
   		my $c = shift;
 
-  		return 1;
+  		my $email = $c->session('email');
+ 		my $password = ($c->session('pass'));
+ 		my $query = $dbh->prepare('SELECT * FROM users WHERE email=\''.$email.'\' and pass=\''.$password.'\'');
+ 		$query->execute();
+
+ 		while (my @arr = $query->fetchrow_array)
+ 		{
+	 		$c->stash(id => $arr[0]);
+			$c->stash(name => $arr[1]);
+			$c->stash(email => $arr[2]);
+			$c->stash(pass => $arr[3]);
+			$c->stash(money => $arr[5]);
+			$c->stash(updated => $arr[6]);
+			$c->stash(created => $arr[7]);
+			$c->stash(photo => $arr[8]);
+		}
+
+
+  		return 1 if $query->rows > 0;
 
   		$c->render(template => 'example/loginform');
 
