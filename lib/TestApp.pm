@@ -47,6 +47,9 @@ sub startup {
   $r->get('/button')->to('example#buttonColor');
   $r->get('/square')->to('example#squareColor');
 
+  $r->post('/upload')->to('contr#uploadPost');
+  $r->get('/upload')->to('contr#upload');
+
 
 
 }

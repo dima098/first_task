@@ -46,9 +46,9 @@
 <% use Data::Dumper;   print Dumper(stash); %>
 
 <% if (stash('action') eq 'addUser' || stash('action') eq 'addUserPost') { %>
-<form role="form" action="/users/add" method="POST">
+<form role="form" action="/users/add" method="POST" enctype="multipart/form-data">
 <% } elsif (stash('action') eq 'changeUser' || stash('action') eq 'changeUserPost') {%>
-<form role="form" action= <%= '/users/'.stash('id').'/change' %> method="POST">
+<form role="form" action= <%= '/users/'.stash('id').'/change' %> method="POST" enctype="multipart/form-data">
  <% } %>
 	 <div class="form-group">
 		  <label for="name">Имя</label>
@@ -96,15 +96,19 @@
 		  %= input_tag 'money', type => 'number', class => 'form-control', id => 'money', placeholder => 'Количество денег', value => stash('money')
 	 </div>
 
- 	 <div class="form-group">
-	 	
+ 	 <% if (stash('fileError')) { %>
 
+	 <div class="form-group has-error">
+	 <% } else { %>
+	 <div class="form-group">
+	 <%}%>
+	 
 	 <p>
-		Выберите фото:
+		<label class="control-label">Выберите фото:</label>
 		
-		%= input_tag 'photo', type => 'file'
+		<input type="file" name="image" >
 	</p>
-
+	</div>
 	 </div>
 
  	<button type="submit" class="btn btn-success">Сохранить</button>

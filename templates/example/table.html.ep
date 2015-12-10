@@ -53,6 +53,7 @@
 		<% } %>
 		</label></h4>
 		</div>
+		
 		<table class="table">
 			 <thead>
 			 <tr>
@@ -80,7 +81,12 @@
 	 			 <td><%= $arr[5] %></td>
 				 <td><%= $arr[6] %></td>
 				 <td><%= $arr[7] %></td>
-				 <td><img src="https://www.google.ru/images/nav_logo242.png" width="50" height="50"></td>
+				 <% if ($arr[8] eq '') { %>
+				 <td></td>
+				 <% } else { %>
+				 <td><%= image $arr[8], width => '50', height => '50' %></td>
+				 <% } %>
+
 				 <% my $link = '/users/'.$arr[0].'/remove'; %>
 				 <% my $link2 = '/users/'.$arr[0].'/change'; %>
 				 <td><%= link_to $link => begin %><span class="glyphicon glyphicon-remove"> <% end %></td>

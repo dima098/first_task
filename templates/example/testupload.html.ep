@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>Документ без названия</title>
+        %= stylesheet '/css/bootstrap.min.css'
+    </head>
+    <body>
+
+    <form method="POST" action="/upload" enctype="multipart/form-data">
+    <input type="file" name="image">
+    <button type="submit">Загрузить</button> 
+    </form>
+    </body>
+</html>

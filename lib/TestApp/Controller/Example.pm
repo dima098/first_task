@@ -26,8 +26,8 @@ sub fun {
 sub test {
 	my $c = shift;
 	my $ua = Mojo::UserAgent->new;
-	my $value = $ua->get('https://sri:s3cret@example.com/test.json')->res->json;
-	print Dumper($value);
+	my $value = $ua->get('/api/test')->res->json;
+  print Dumper($value);
 	$c->render(text => "test");
 };
 

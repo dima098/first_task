@@ -1,11 +1,12 @@
 package TestApp::Controller::Contr;
 use Mojo::Base 'Mojolicious::Controller';
 use DBI;
-use Digest::MD5 qw(md5);
+use Digest::MD5 qw(md5 md5_hex);
 use Mojolicious::Sessions;
 use Mojo::Upload;
 use Data::Dumper;
-
+use Mojo::UserAgent;
+use Mojolicious::Validator;
 
 	sub api {
 		my $c = shift;
@@ -41,6 +42,29 @@ use Data::Dumper;
 
 		$c->render(json => {status => 'ok', users => $arrJson});
 
+	};
+
+	sub uploadPost {
+		my $c = shift;
+		my $filename = $c->param('image')->filename;
+
+		if (lc $filename =~ /(.png|.jpg)$/)
+		{
+			my $file = $c->req->upload('image');
+        	$file->move_to("public/images/aaa.pl");
+        	$c->redirect_to('/users');
+		}
+		else
+		{
+
+		}
+
+
+
+	};
+	sub upload {
+
+		shift->render(template => 'example/testupload');
 	};
 
 	sub login {
@@ -90,7 +114,9 @@ use Data::Dumper;
  		my $query;
  		my $email = $c->stash('email');
 
-
+  		#my $ua = Mojo::UserAgent->new(max_redirects => 5);
+  		#my $tx = $ua->get('latest.mojolicio.us');
+  		#$tx->res->content->asset->move_to('mojo.tar.gz');
 
 
  		if ($param ne '')
@@ -136,26 +162,36 @@ use Data::Dumper;
 		my $passwordRepeat = $c->param('passwordRepeat');
 		my $email = $c->param('email');
 		my $money = $c->param('money');
-		my $arrErrors = [validatePassword($password, $passwordRepeat), validateEmail($c ,$email), validateMoney($money)];
-		my $summary = $arrErrors->[0] + $arrErrors->[1] + $arrErrors->[2];
+		my $filename = $c->param('image')->filename;
+		my $arrErrors = [validatePassword($password, $passwordRepeat), validateEmail($c ,$email), validateMoney($money), validateFile($filename)];
+		my $summary = $arrErrors->[0] + $arrErrors->[1] + $arrErrors->[2] + $arrErrors->[3];
 		
 		if (!$summary)
 		{
-			my $dbh = $c->dbcon;
-			my $query = $dbh->prepare('INSERT INTO users (name, pass, email, money) VALUES(?,?,?,?)');
-			$query->execute($name, $password, $email, $money);
-    
 
+			my $file = $c->req->upload('image');
+			my $newName = makeUniqueFileName($name, $email, $filename);
+	        $file->move_to("public/images/".$newName);
+
+			my $dbh = $c->dbcon;
+			my $query = $dbh->prepare('INSERT INTO users (name, pass, email, money, photo) VALUES(?,?,?,?,?)');
+			$query->execute($name, $password, $email, $money, "images/".$newName);
+	        	
 			$c->flash(messageFlash => 'User has added');
 
 			$c->redirect_to('/users'); 
 		}
 		else
 		{
-			$c->render(template => 'example/form', email => $email, emailError => $arrErrors->[1] , name => $name, money => $money, moneyError => $arrErrors->[2], passwordError => $arrErrors->[0]); 
+			$c->render(template => 'example/form', 
+				email => $email,
+				emailError => $arrErrors->[1],
+				name => $name, money => $money,
+				moneyError => $arrErrors->[2],
+				passwordError => $arrErrors->[0],
+				fileError => $arrErrors->[3]); 
 		}
 		
-		#$c->render(template => 'example/form', password => $arrErrors->[0], email => $arrErrors->[1], money => $arrErrors->[2]);
 	};
 
 	sub changeUser {
@@ -277,12 +313,32 @@ use Data::Dumper;
 		}
 	};
 
-
-
 	sub validateMoney {
 		my $money = shift;
 		return $money >= 0 ? 0 : 1;  
 	};
+
+	sub validateFile {
+		my $filename = shift;
+		if (lc $filename =~ /(.png|.jpg)$/ or $filename eq '')
+		{
+			return 0;
+		}
+		else
+		{
+			return 1;
+		}
+	};
+
+	sub makeUniqueFileName
+	{
+		my ($name, $email, $filename) = @_;
+
+		print Dumper(join '', md5_hex(join '', $name, $email, $filename, time), ".", substr($filename, -3));
+
+		return join '', md5_hex(join '', $name, $email, $filename, time), ".", substr($filename, -3);
+
+	}
 
 
 1;
