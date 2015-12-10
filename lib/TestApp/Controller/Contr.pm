@@ -224,13 +224,24 @@ use Mojolicious::Validator;
 		my $passwordRepeat = $c->param('passwordRepeat');
 		my $email = $c->param('email');
 		my $money = $c->param('money');
-
-		my $arrErrors = [validatePasswordForChange($password, $passwordRepeat), validateEmailChange($c, $email), validateMoney($money)];
-		my $summary = $arrErrors->[0] + $arrErrors->[1] + $arrErrors->[2];
+		my $filename = $c->param('image')->filename;
+		my $arrErrors = [validatePasswordForChange($password, $passwordRepeat), validateEmailChange($c, $email), validateMoney($money), validateFile($filename)];
+		my $summary = $arrErrors->[0] + $arrErrors->[1] + $arrErrors->[2] + $arrErrors->[3];
 		
 		if (!$summary)
 		{
 			my $dbh = $c->dbcon;
+			
+			if ($filename ne '')
+			{
+				my $file = $c->req->upload('image');
+				my $newName = makeUniqueFileName($name, $email, $filename);
+	        	$file->move_to("public/images/".$newName);
+
+	        	my $query = $dbh->prepare('UPDATE users SET photo=? WHERE id=?');
+				$query->execute("images/".$newName, $c->stash('id'));
+	    	}
+			
 			if (!wontChange($password, $passwordRepeat))
 			{
 				print 'UPDATE users SET name=?, password=?, email=?, money=? WHERE id=?';
@@ -246,7 +257,7 @@ use Mojolicious::Validator;
 			$c->redirect_to('/users'); 
 		}
 
-		$c->render(template => 'example/form', passwordError => $arrErrors->[0], emailError => $arrErrors->[1], moneyError => $arrErrors->[2]);
+		$c->render(template => 'example/form', passwordError => $arrErrors->[0], emailError => $arrErrors->[1], moneyError => $arrErrors->[2], fileError => $arrErrors->[3]);
 	};
 
 
