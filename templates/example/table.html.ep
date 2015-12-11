@@ -1,109 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <title>Документ без названия</title>
-        %= stylesheet 'css/bootstrap.min.css'
-
-    </head>
-    <body>
- 		<div class="page-header">
-  	<div class="container">
-  		<div class="row-fluid">
-          <h1><p class="text-center">Mojolicious</p></h1>
-      	</div>
-  	</div>
-</div>
-
-<nav class="navbar navbar-default">
-  <div class="container-fluid">
-
-    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-      <ul class="nav navbar-nav">
-      	<li><a href="/users/add">Добавить пользователя</a></li>
-        <li><a href="/users">Показать всю таблицу</a></li>
-      </ul>
-
-      <ul class="nav navbar-nav navbar-right">
-      	<li><a href=""> <%= stash 'emailLogged' %></a></li>
-        <li><a href="/logout">Выход</a></li>
-
-      <form class="navbar-form navbar-right" role="form" method="GET" action="/users">
-        <div class="form-group">
-          <input type="text" class="form-control" name="sparam"  placeholder="Имя или Email">
-        </div>
-        <button type="submit" class="btn btn-default">Поиск</button>
-      </form>
-
-
-        
-      </ul>
-    </div>
-  </div>
-</nav>
-
-
- 		<div class="has-success" align="center">
-		<h4><label class="text-center control-label" id="messageShow"> <% if (flash('messageFlash') eq 'User has removed') { %>
-			Пользователь удален
-		<% } elsif (flash('messageFlash') eq 'User has added') { %> 
-			Пользователь добавлен
-		<% } elsif (flash('messageFlash') eq 'User has changed') { %>
-			Пользователь изменен
-		<% } %>
-		</label></h4>
+	<head>
+	<meta charset="utf-8" />
+		<title>Документ без названия</title>
+		%= stylesheet 'css/bootstrap.min.css'
+	</head>
+	<body>
+		<div class="page-header">
+			<div class="container">
+				<div class="row-fluid">
+					<h1><p class="text-center">Mojolicious</p></h1>
+				</div>
+			</div>
 		</div>
-		
+		<nav class="navbar navbar-default">
+			<div class="container-fluid">
+				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+					<ul class="nav navbar-nav">
+						<li><a href="/users/add">Добавить пользователя</a></li>
+						<li><a href="/users">Показать всю таблицу</a></li>
+					</ul>
+					<ul class="nav navbar-nav navbar-right">
+						<li><a href=""> <%= $user->{email} %></a></li>
+						<li><a href="/logout">Выход</a></li>
+						<form class="navbar-form navbar-right" role="form" method="GET" action="/users">
+							<div class="form-group">
+								<input type="text" class="form-control" name="sparam"  placeholder="Имя или Email">
+							</div>
+							<button type="submit" class="btn btn-default">Поиск</button>
+						</form>
+					</ul>
+				</div>
+			</div>
+		</nav>
+		<div class="has-success" align="center">
+			<h4><label class="text-center control-label" id="messageShow"> <% if (flash('messageFlash') eq 'User has removed') { %>
+			Пользователь удален
+			<% } elsif (flash('messageFlash') eq 'User has added') { %> 
+			Пользователь добавлен
+			<% } elsif (flash('messageFlash') eq 'User has changed') { %>
+			Пользователь изменен
+			<% } %>
+			</label></h4>
+		</div>
 		<table class="table">
-			 <thead>
-			 <tr>
-			 	 <th>ID</th>
-				 <th>Имя</th>
-				 <th>Email</th>
-				 <th>Деньги</th>
-	 			 <th>Обновлен</th>
-				 <th>Создан</th>
-				 <th>Аватар</th>>
-				 <th></th>
-				 <th></th>
-				 
-			 </tr>
-			 </thead>
-			 <tbody>
-			 
-			 <% my $count = 0; %>
-			 <% while (my @arr = $message->fetchrow_array) { %>
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>Имя</th>
+					<th>Email</th>
+					<th>Деньги</th>
+					<th>Обновлен</th>
+					<th>Создан</th>
+					<th>Аватар</th>>
+					<th></th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+				<% my $count = 0; %>
+				<% while (my @arr = $message->fetchrow_array) { %>
+				<tr>
+					<td><%= $arr[0] %></td>
+					<td><%= $arr[1] %></td>
+					<td><%= $arr[2] %></td>
+					<td><%= $arr[5] %></td>
+					<td><%= $arr[6] %></td>
+					<td><%= $arr[7] %></td>
+					<% if ($arr[8] eq '') { %>
+					<td></td>
+					<% } else { %>
+					<td><%= image $arr[8], width => '50', height => '50' %></td>
+					<% } %>
 
-			 <tr>
-				 <td><%= $arr[0] %></td>
-				 <td><%= $arr[1] %></td>
-				 <td><%= $arr[2] %></td>
-	 			 <td><%= $arr[5] %></td>
-				 <td><%= $arr[6] %></td>
-				 <td><%= $arr[7] %></td>
-				 <% if ($arr[8] eq '') { %>
-				 <td></td>
-				 <% } else { %>
-				 <td><%= image $arr[8], width => '50', height => '50' %></td>
-				 <% } %>
-
-				 <% my $link = '/users/'.$arr[0].'/remove'; %>
-				 <% my $link2 = '/users/'.$arr[0].'/change'; %>
-				 <td><%= link_to $link => begin %><span class="glyphicon glyphicon-remove"> <% end %></td>
-				 <td><%= link_to $link2 => begin %><span class="glyphicon glyphicon-pencil"> <% end %></td>
-				 
-			 </tr>
-
-			<% $count++; %>
-			 <% } %>
-
-			 </tbody>
-		 </table>
-		 <% if (!$count) { %>
-		 <p class="text-center">Данных нет</p>
-		 <% } %>
-
-        <script src="js/bootstrap.min.js"></script>
-        <script src="http://code.jquery.com/jquery-latest.js"></script>
-    </body>
+					<% my $link = '/users/'.$arr[0].'/remove'; %>
+					<% my $link2 = '/users/'.$arr[0].'/change'; %>
+					<td><%= link_to $link => begin %><span class="glyphicon glyphicon-remove"> <% end %></td>
+					<td><%= link_to $link2 => begin %><span class="glyphicon glyphicon-pencil"> <% end %></td>
+				</tr>
+				<% $count++; %>
+				<% } %>
+			</tbody>
+		</table>
+		<% if (!$count) { %>
+		<p class="text-center">Данных нет</p>
+		<% } %>
+		<script src="js/bootstrap.min.js"></script>
+		<script src="http://code.jquery.com/jquery-latest.js"></script>
+	</body>
 </html>

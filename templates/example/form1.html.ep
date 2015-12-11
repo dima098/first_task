@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	<meta charset="utf-8" />
+		<title>Документ без названия</title>
+		%= stylesheet '/css/bootstrap.min.css'
+	</head>
+	<body>
+		<div class="page-header">
+			<div class="container">
+				<div class="row-fluid">
+					<h1><p class="text-center">Mojolicious</p></h1>
+				</div>
+			</div>
+		</div>
+		<nav class="navbar navbar-default">
+			<div class="container-fluid">
+				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+				<ul class="nav navbar-nav">
+					<li><a href="/users/add">Добавить пользователя</a></li>
+					<li><a href="/users">Показать всю таблицу</a></li>
+				</ul>
+				<ul class="nav navbar-nav navbar-right">
+					<li><a href=""> <%= $user->{email} %></a></li>
+					<li><a href="#">Выход</a></li>
+					<form class="navbar-form navbar-right" role="form" method="GET" action="/users">
+						<div class="form-group">
+							<input type="text" class="form-control" name="sparam"  placeholder="Имя или Email">
+						</div>
+						<button type="submit" class="btn btn-default">Поиск</button>
+					</form>
+				</ul>
+				</div>
+			</div>
+		</nav>
+		<% my $hash_values = stash('values'); %>
+		<% my $hash_errors = stash('errors'); %>
+		<% use Data::Dumper; print Dumper($hash_errors); %>
+		<% if (stash('action') eq 'addUser' || stash('action') eq 'addUserPost') { %>
+		<form role="form" action="/users/add" method="POST" enctype="multipart/form-data">
+		<% } elsif (stash('action') eq 'changeUser' || stash('action') eq 'changeUserPost') {%>
+		<form role="form" action= <%= '/users/'.$hash_values->{id}.'/change' %> method="POST" enctype="multipart/form-data">
+		<% } %>
+			<div class="form-group">
+				<label for="name">Имя</label>
+				%= input_tag 'name', type => 'text', class => 'form-control', id => 'name', placeholder => 'Введите имя', value => $hash_values->{name}
+			</div>
+			<% if (exists $hash_errors->{email} && scalar(@{$hash_errors->{email}})) { %>
+			<% use Data::Dumper; print Dumper(scalar(@{$hash_errors->{email}})); %>
+			<div class="form-group has-error">
+			<% } else { %>
+			<div class="form-group">
+			<%}%>
+				<label class="control-label" for="email">Email</label>
+				%= input_tag 'email', type => 'email', class => 'form-control', id => 'email', placeholder => 'Введите email', value => $hash_values->{email}
+			</div>
+			<% if (exists $hash_errors->{password} && scalar(@ {$hash_errors->{password} })) { %>
+			<div class="form-group has-error">
+			<% } else { %>
+			<div class="form-group">
+			<%}%>
+				<label class="control-label" for="pass">Пароль</label>
+				<input type="password" class="form-control" id="pass" placeholder="Пароль" name="password">
+			</div>
+			<% if (exists $hash_errors->{password} && scalar(@ {$hash_errors->{password} })) { %>
+			<div class="form-group has-error">
+			<% } else { %>
+			<div class="form-group">
+			<%}%>
+				<label class="control-label" for="passrepeat">Повторите пароль</label>
+				<input type="password" class="form-control" id="passrepeat" placeholder="Повторите пароль" name="passwordRepeat">
+			</div>
+			<% if (exists $hash_errors->{money} && scalar(@ {$hash_errors->{money} })) { %>
+			<div class="form-group has-error">
+			<% } else { %>
+			<div class="form-group">
+			<%}%>
+				<label class="control-label" for="passrepeat">Количество денег</label>
+				%= input_tag 'money', type => 'number', class => 'form-control', id => 'money', placeholder => 'Количество денег', value => $hash_values->{money}
+			</div>
+			<% if (exists $hash_errors->{filename} && scalar(@ {$hash_errors->{filename} })) { %>
+			<div class="form-group has-error">
+			<% } else { %>
+			<div class="form-group">
+			<%}%>
+				<p>
+					<label class="control-label">Выберите фото:</label>
+					<input type="file" name="image" >
+				</p>
+			</div>
+			</div>
+				<button type="submit" class="btn btn-success">Сохранить</button>
+				<button type="button" class="btn btn-danger" onclick="cancel()">Отмена</button>
+			<script type="text/javascript">
+			function cancel() 
+			{
+			window.location.href='/users';
+
+			}
+			</script>
+		</form>
+		<script src="js/bootstrap.min.js"></script>
+		<script src="http://code.jquery.com/jquery-latest.js"></script>
+	</body>
+</html>
